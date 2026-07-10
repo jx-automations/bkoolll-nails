@@ -77,8 +77,8 @@ button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation
   .mobile-menu-btn { display: flex !important; }
   .about-grid { grid-template-columns: 1fr !important; }
   .about-grid > div:last-child { order: -1; }
-  .photo-mosaic { grid-template-columns: 1fr 1fr !important; }
-  .photo-mosaic > div { height: 130px !important; }
+  .owner-photo-frame { height: 300px !important; }
+  .about-support-photo { height: 120px !important; }
   .gallery-grid { grid-template-columns: 1fr 1fr !important; grid-auto-rows: 150px !important; }
   .gallery-tall { grid-row: span 1 !important; }
   .hero-ctas, .booking-ctas { flex-direction: column !important; align-items: stretch !important; }
@@ -109,19 +109,24 @@ const T = {
   blush: '#f6c9d4',
   blushDp: '#e2a3b4',
   blushLt: '#fbf8f2',
-  rose: '#e2a3b4',
-  roseDp: '#b97e8f',
+  rose: '#cf8399',
+  roseDp: '#8f4c68',
   roseLt: '#f6dde3',
+  roseBtn: '#9c4f68',
+  roseBtnDp: '#7e3c52',
   warmWhite: '#fffdf9',
-  bgAlt: '#fbf8f2',
+  bgAlt: '#f5efe0',
   text: '#33403a',
   text2: '#5c6b62',
-  text3: '#8a978e',
+  text3: '#788479',
   border: '#e6ddce',
+  divider: 'rgba(51,64,58,0.10)',
   white: '#fffdf9',
   dark: '#e9ecdf',
-  darkDeep: '#7c9485',
+  darkDeep: '#5f7368',
 };
+
+const SECTION_DIVIDER = { borderTop: `1px solid ${T.divider}` };
 
 const serif = "'Cormorant Garamond', Georgia, serif";
 const sans = "'Jost', Helvetica, Arial, sans-serif";
@@ -143,14 +148,14 @@ const Btn = ({ children, variant = 'primary', size = 'md', onClick, style = {}, 
 
   const variants = {
     primary: {
-      background: hov ? T.blushDp : T.blush,
+      background: hov ? T.roseBtnDp : T.roseBtn,
       color: '#fff',
-      boxShadow: hov ? '0 6px 28px rgba(226,163,180,0.55)' : '0 4px 20px rgba(246,201,212,0.45)',
+      boxShadow: hov ? '0 6px 28px rgba(126,60,82,0.5)' : '0 4px 20px rgba(156,79,104,0.38)',
     },
     rose: {
-      background: hov ? T.roseDp : T.rose,
+      background: hov ? T.roseBtnDp : T.roseBtn,
       color: '#fff',
-      boxShadow: hov ? '0 6px 28px rgba(185,126,143,0.4)' : '0 4px 20px rgba(226,163,180,0.3)',
+      boxShadow: hov ? '0 6px 28px rgba(126,60,82,0.4)' : '0 4px 20px rgba(156,79,104,0.3)',
     },
     ghost: {
       background: hov ? T.bgAlt : 'transparent',
@@ -158,9 +163,9 @@ const Btn = ({ children, variant = 'primary', size = 'md', onClick, style = {}, 
       border: `1.5px solid ${T.border}`,
     },
     dark: {
-      background: hov ? '#6a8074' : T.darkDeep,
+      background: hov ? '#4c5c53' : T.darkDeep,
       color: '#fff',
-      boxShadow: hov ? '0 6px 28px rgba(124,148,133,0.45)' : '0 4px 20px rgba(124,148,133,0.26)',
+      boxShadow: hov ? '0 6px 28px rgba(95,115,104,0.45)' : '0 4px 20px rgba(95,115,104,0.28)',
     },
     darkOutline: {
       background: 'transparent',
@@ -383,19 +388,38 @@ const Header = ({ page, onNav }) => {
 const Hero = ({ onServices }) => {
   const heroRef = React.useRef();
   const contentRef = React.useRef();
+  const bgRef = React.useRef();
 
   React.useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
 
     const ctx = gsap.context(() => {
       const heroItems = contentRef.current?.querySelectorAll('[data-hero]');
-      if (!heroItems?.length) return;
+      if (heroItems?.length) {
+        gsap.fromTo(
+          heroItems,
+          { opacity: 0, y: 32 },
+          { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power2.out' }
+        );
+      }
 
-      gsap.fromTo(
-        heroItems,
-        { opacity: 0, y: 32 },
-        { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power2.out' }
-      );
+      if (bgRef.current) {
+        gsap.fromTo(
+          bgRef.current,
+          { scale: 1.16 },
+          { scale: 1.05, duration: 1.8, ease: 'power3.out' }
+        );
+        gsap.to(bgRef.current, {
+          yPercent: 10,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.6,
+          },
+        });
+      }
     }, heroRef);
 
     return () => ctx.revert();
@@ -414,6 +438,7 @@ const Hero = ({ onServices }) => {
       }}
     >
       <div
+        ref={bgRef}
         style={{
           position: 'absolute',
           inset: '-10%',
@@ -424,30 +449,31 @@ const Hero = ({ onServices }) => {
           willChange: 'transform',
         }}
       />
-      <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(160deg,rgba(251,248,242,0.78) 0%,rgba(255,253,249,0.66) 48%,rgba(124,148,133,0.55) 100%)' }} />
+      <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(185deg,rgba(30,36,32,0.42) 0%,rgba(30,36,32,0.30) 32%,rgba(30,36,32,0.55) 68%,rgba(30,36,32,0.78) 100%)' }} />
+      <div style={{ position: 'absolute', left: '50%', top: '48%', transform: 'translate(-50%,-50%)', zIndex: 1, width: 'min(900px,92vw)', height: '72%', background: 'radial-gradient(ellipse at center, rgba(24,29,26,0.5) 0%, rgba(24,29,26,0.22) 55%, rgba(24,29,26,0) 78%)' }} />
 
       <div ref={contentRef} style={{ maxWidth: 780, textAlign: 'center', position: 'relative', zIndex: 2, padding: '120px clamp(24px,8vw,80px) 80px' }}>
-        <div data-hero style={{ fontFamily: sans, fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', textTransform: 'uppercase', color: T.roseDp, marginBottom: 24 }}>
+        <div data-hero style={{ fontFamily: sans, fontSize: 11, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: T.blush, marginBottom: 24, textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}>
           Nail Artist &middot; Phoenix, AZ
         </div>
-        <h1 data-hero style={{ fontFamily: serif, fontSize: 'clamp(52px,7.5vw,96px)', fontWeight: 600, lineHeight: 1.02, letterSpacing: '-0.01em', color: T.text, marginBottom: 8 }}>
+        <h1 data-hero style={{ fontFamily: serif, fontSize: 'clamp(52px,7.5vw,96px)', fontWeight: 600, lineHeight: 1.02, letterSpacing: '-0.01em', color: T.warmWhite, marginBottom: 8, textShadow: '0 4px 28px rgba(0,0,0,0.4)' }}>
           Hey!<br />It&apos;s Ivy.
         </h1>
-        <div data-hero style={{ fontFamily: serif, fontStyle: 'italic', fontSize: 'clamp(22px,3vw,38px)', fontWeight: 300, color: T.roseDp, marginBottom: 28, lineHeight: 1.3 }}>
+        <div data-hero style={{ fontFamily: serif, fontStyle: 'italic', fontSize: 'clamp(22px,3vw,38px)', fontWeight: 300, color: T.blush, marginBottom: 28, lineHeight: 1.3, textShadow: '0 2px 16px rgba(0,0,0,0.35)' }}>
           Soft sets, delicate art, made just for you.
         </div>
-        <p style={{ fontFamily: sans, fontSize: 'clamp(14px,1.4vw,17px)', color: T.text2, lineHeight: 1.75, maxWidth: 520, margin: '0 auto 44px', fontWeight: 300 }}>
+        <p style={{ fontFamily: sans, fontSize: 'clamp(14px,1.4vw,17px)', color: 'rgba(255,253,249,0.92)', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 44px', fontWeight: 300, textShadow: '0 2px 10px rgba(0,0,0,0.35)' }}>
           b.koolll is where dainty florals, soft French tips, and little hand-painted details come together - one set at a time.
         </p>
         <div data-hero className="hero-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Btn href={BOOKING_URL} size="lg">DM to book</Btn>
-          <Btn onClick={onServices} variant="ghost" size="lg">Our services</Btn>
+          <Btn onClick={onServices} variant="darkOutline" size="lg">Our services</Btn>
         </div>
         <div className="stats-row" style={{ display: 'flex', gap: 48, justifyContent: 'center', marginTop: 64, flexWrap: 'wrap' }}>
           {[['Gel-X', 'Full Sets'], ['French', 'Tips'], ['Nail Art', 'Add-on']].map(([n, l]) => (
             <div key={l + n} style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: serif, fontSize: 26, fontWeight: 600, color: T.text, letterSpacing: '-0.01em' }}>{n}</div>
-              <div style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, color: T.text3, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 4 }}>{l}</div>
+              <div style={{ fontFamily: serif, fontSize: 26, fontWeight: 600, color: T.warmWhite, letterSpacing: '-0.01em', textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}>{n}</div>
+              <div style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, color: 'rgba(255,253,249,0.7)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 4 }}>{l}</div>
             </div>
           ))}
         </div>
@@ -522,7 +548,7 @@ const ServiceCard = ({ s }) => {
         <div style={{ position: 'absolute', inset: 0, background: hov ? 'rgba(246,201,212,0.16)' : 'transparent', transition: 'background 0.3s' }} />
       </div>
       <div style={{ padding: '20px 22px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: T.rose, marginBottom: 7 }}>{s.label}</div>
+        <div style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: T.roseDp, marginBottom: 7 }}>{s.label}</div>
         <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 500, color: T.text, marginBottom: 8 }}>{s.name}</div>
         <div style={{ fontFamily: sans, fontSize: 13, fontWeight: 300, color: T.text2, lineHeight: 1.65, flex: 1, marginBottom: 18 }}>{s.desc}</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -536,42 +562,59 @@ const ServiceCard = ({ s }) => {
 
 const Services = () => {
   const cardsRef = React.useRef();
+  const headerRef = React.useRef();
 
   React.useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !cardsRef.current) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
 
     const ctx = gsap.context(() => {
-      const cards = cardsRef.current.querySelectorAll('[data-service-card]');
-      if (!cards.length) return;
+      if (headerRef.current) {
+        const headerItems = headerRef.current.querySelectorAll('[data-reveal]');
+        gsap.fromTo(
+          headerItems,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.12,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: headerRef.current, start: 'top 85%', once: true },
+          }
+        );
+      }
 
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 36 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.2,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: 'top 80%',
-            once: true,
-          },
-        }
-      );
-    }, cardsRef);
+      const cards = cardsRef.current?.querySelectorAll('[data-service-card]');
+      if (cards?.length) {
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 36 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: 'top 80%',
+              once: true,
+            },
+          }
+        );
+      }
+    });
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', background: T.bgAlt }}>
+    <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', background: T.bgAlt, ...SECTION_DIVIDER }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 56 }}>
-          <div style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.rose, marginBottom: 14 }}>What we do</div>
-          <h2 style={{ fontFamily: serif, fontSize: 'clamp(32px,4vw,52px)', fontWeight: 500, color: T.text, letterSpacing: '-0.01em', lineHeight: 1.1, marginBottom: 16 }}>Our services</h2>
-          <p style={{ fontFamily: sans, fontSize: 16, fontWeight: 300, color: T.text2, maxWidth: 460, margin: '0 auto', lineHeight: 1.7 }}>
+        <div ref={headerRef} style={{ textAlign: 'center', marginBottom: 56 }}>
+          <div data-reveal style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.roseDp, marginBottom: 14 }}>What we do</div>
+          <h2 data-reveal style={{ fontFamily: serif, fontSize: 'clamp(32px,4vw,52px)', fontWeight: 500, color: T.text, letterSpacing: '-0.01em', lineHeight: 1.1, marginBottom: 16 }}>Our services</h2>
+          <p data-reveal style={{ fontFamily: sans, fontSize: 16, fontWeight: 300, color: T.text2, maxWidth: 460, margin: '0 auto', lineHeight: 1.7 }}>
             Gel-X, French tips, and hand-painted nail art for clients who love a soft, delicate set.
           </p>
         </div>
@@ -603,28 +646,45 @@ const galleryLayout = IMG.filter(Boolean).map((img, index) => ({
 const Gallery = ({ fullGrid = false }) => {
   const [lightbox, setLightbox] = React.useState({ open: false, idx: 0 });
   const gridRef = React.useRef();
+  const headerRef = React.useRef();
   const items = fullGrid ? galleryLayout : galleryLayout.slice(0, Math.min(6, galleryLayout.length));
 
   React.useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !gridRef.current) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
 
     const ctx = gsap.context(() => {
-      const imgs = gridRef.current.querySelectorAll('.gallery-item');
-      if (!imgs.length) return;
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current.querySelectorAll('[data-reveal]'),
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: headerRef.current, start: 'top 85%', once: true },
+          }
+        );
+      }
 
-      gsap.fromTo(
-        imgs,
-        { opacity: 0, scale: 0.95 },
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 0.6,
-          stagger: 0.15,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: gridRef.current, start: 'top 80%', once: true },
-        }
-      );
-    }, gridRef);
+      const imgs = gridRef.current?.querySelectorAll('.gallery-item');
+      if (imgs?.length) {
+        gsap.fromTo(
+          imgs,
+          { opacity: 0, y: 30, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: 'power2.out',
+            scrollTrigger: { trigger: gridRef.current, start: 'top 80%', once: true },
+          }
+        );
+      }
+    });
 
     return () => ctx.revert();
   }, [fullGrid]);
@@ -645,14 +705,14 @@ const Gallery = ({ fullGrid = false }) => {
   }, [items.length]);
 
   return (
-    <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', background: T.white }}>
+    <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', background: T.white, ...SECTION_DIVIDER }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}>
+        <div ref={headerRef} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.rose, marginBottom: 12 }}>Portfolio</div>
-            <h2 style={{ fontFamily: serif, fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 500, color: T.text, letterSpacing: '-0.01em', lineHeight: 1.1 }}>Signature sets</h2>
+            <div data-reveal style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.roseDp, marginBottom: 12 }}>Portfolio</div>
+            <h2 data-reveal style={{ fontFamily: serif, fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 500, color: T.text, letterSpacing: '-0.01em', lineHeight: 1.1 }}>Signature sets</h2>
           </div>
-          <span style={{ fontFamily: sans, fontSize: 13, fontWeight: 400, color: T.rose, cursor: 'pointer', borderBottom: `1px solid ${T.rose}`, paddingBottom: 2, letterSpacing: '0.04em' }}>View all -&gt;</span>
+          <span data-reveal style={{ fontFamily: sans, fontSize: 13, fontWeight: 400, color: T.roseDp, cursor: 'pointer', borderBottom: `1px solid ${T.roseDp}`, paddingBottom: 2, letterSpacing: '0.04em' }}>View all -&gt;</span>
         </div>
 
         <div
@@ -742,39 +802,57 @@ const Gallery = ({ fullGrid = false }) => {
 
 const About = () => {
   const sectionRef = React.useRef();
-  const aboutImages = ['owner.jpg', ...IMG.slice(4, 7)].filter(Boolean);
+  const visualRef = React.useRef();
+  const supportImages = [IMG[4], IMG[5]].filter(Boolean);
 
   React.useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !sectionRef.current) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
 
     const ctx = gsap.context(() => {
-      const textItems = sectionRef.current.querySelectorAll('[data-about-text]');
-      if (!textItems.length) return;
+      const textItems = sectionRef.current?.querySelectorAll('[data-about-text]');
+      if (textItems?.length) {
+        gsap.fromTo(
+          textItems,
+          { opacity: 0, x: -30 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 80%',
+              once: true,
+            },
+          }
+        );
+      }
 
-      gsap.fromTo(
-        textItems,
-        { opacity: 0, x: -30 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.7,
-          stagger: 0.12,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 80%',
-            once: true,
-          },
-        }
-      );
-    }, sectionRef);
+      const visualItems = visualRef.current?.querySelectorAll('[data-about-img]');
+      if (visualItems?.length) {
+        gsap.fromTo(
+          visualItems,
+          { opacity: 0, y: 30, scale: 0.97 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: visualRef.current, start: 'top 80%', once: true },
+          }
+        );
+      }
+    });
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', background: T.dark }}>
-      <div className="about-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(40px,6vw,96px)', alignItems: 'center' }}>
+    <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', background: T.dark, ...SECTION_DIVIDER }}>
+      <div className="about-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 'clamp(40px,6vw,96px)', alignItems: 'center' }}>
         <div ref={sectionRef}>
           <div data-about-text style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.roseDp, marginBottom: 16 }}>About Ivy</div>
           <h2 data-about-text style={{ fontFamily: serif, fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 500, color: T.text, letterSpacing: '-0.01em', lineHeight: 1.1, marginBottom: 24 }}>
@@ -788,9 +866,35 @@ const About = () => {
           </p>
           <Btn href={BOOKING_URL} variant="dark">DM to Book</Btn>
         </div>
-        <div className="photo-mosaic" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {aboutImages.map((src, i) => (
-            <div key={i} style={{ borderRadius: 10, overflow: 'hidden', height: i === 0 || i === 3 ? 220 : 165 }}>
+        <div ref={visualRef} className="about-visual" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoRows: 'auto', gap: 14 }}>
+          <div
+            data-about-img
+            className="owner-photo-frame"
+            style={{
+              gridColumn: '1 / -1',
+              borderRadius: 20,
+              overflow: 'hidden',
+              border: `8px solid ${T.white}`,
+              boxShadow: '0 28px 60px -16px rgba(51,64,58,0.32), 0 8px 24px rgba(51,64,58,0.14)',
+              height: 'clamp(320px,36vw,460px)',
+            }}
+          >
+            <img
+              src="owner.jpg"
+              alt="Ivy, licensed nail technician in Phoenix, AZ"
+              loading="lazy"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s ease' }}
+              onMouseEnter={(e) => { e.target.style.transform = 'scale(1.04)'; }}
+              onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; }}
+            />
+          </div>
+          {supportImages.map((src, i) => (
+            <div
+              key={i}
+              data-about-img
+              className="about-support-photo"
+              style={{ borderRadius: 14, overflow: 'hidden', height: 150, boxShadow: '0 6px 20px rgba(51,64,58,0.10)' }}
+            >
               <img
                 src={src}
                 alt=""
@@ -814,37 +918,81 @@ const testimonials = [
 ];
 
 const Testimonials = () => {
+  const headerRef = React.useRef();
+  const cardsRef = React.useRef();
+
+  React.useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const ctx = gsap.context(() => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current.querySelectorAll('[data-reveal]'),
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.12,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: headerRef.current, start: 'top 85%', once: true },
+          }
+        );
+      }
+
+      const cards = cardsRef.current?.querySelectorAll('[data-testimonial]');
+      if (cards?.length) {
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 26 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.13,
+            ease: 'power2.out',
+            scrollTrigger: { trigger: cardsRef.current, start: 'top 82%', once: true },
+          }
+        );
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', background: T.bgAlt }}>
+    <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', background: T.bgAlt, ...SECTION_DIVIDER }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 52 }}>
-          <div style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.rose, marginBottom: 12 }}>Client love</div>
-          <h2 style={{ fontFamily: serif, fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 500, color: T.text, letterSpacing: '-0.01em', lineHeight: 1.1 }}>What they&apos;re saying</h2>
+        <div ref={headerRef} style={{ textAlign: 'center', marginBottom: 52 }}>
+          <div data-reveal style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.roseDp, marginBottom: 12 }}>Client love</div>
+          <h2 data-reveal style={{ fontFamily: serif, fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 500, color: T.text, letterSpacing: '-0.01em', lineHeight: 1.1 }}>What they&apos;re saying</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 20 }}>
+        <div ref={cardsRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 20 }}>
           {testimonials.map((t, i) => (
             <div
               key={i}
+              data-testimonial
               style={{
                 background: T.white,
                 borderRadius: 12,
                 padding: '30px 26px',
-                boxShadow: '0 2px 14px rgba(51,64,58,0.05)',
+                boxShadow: '0 2px 14px rgba(51,64,58,0.07)',
+                border: `1px solid ${T.border}`,
                 transition: 'transform 0.25s, box-shadow 0.25s',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 8px 32px rgba(51,64,58,0.09)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(51,64,58,0.12)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 14px rgba(51,64,58,0.05)';
+                e.currentTarget.style.boxShadow = '0 2px 14px rgba(51,64,58,0.07)';
               }}
             >
-              <div style={{ fontFamily: serif, fontSize: 44, color: T.blush, lineHeight: 1, marginBottom: 12, fontWeight: 300 }}>&quot;</div>
+              <div style={{ fontFamily: serif, fontSize: 44, color: T.rose, lineHeight: 1, marginBottom: 12, fontWeight: 300 }}>&quot;</div>
               <p style={{ fontFamily: serif, fontStyle: 'italic', fontSize: 18, color: T.text, lineHeight: 1.65, marginBottom: 22 }}>{t.text}</p>
               <div style={{ fontFamily: sans, fontSize: 13, fontWeight: 500, color: T.text }}>{t.author}</div>
-              <div style={{ fontFamily: sans, fontSize: 11, color: T.text3, marginTop: 3, letterSpacing: '0.04em' }}>{t.service}</div>
+              <div style={{ fontFamily: sans, fontSize: 11, color: T.text2, marginTop: 3, letterSpacing: '0.04em' }}>{t.service}</div>
             </div>
           ))}
         </div>
@@ -855,19 +1003,19 @@ const Testimonials = () => {
 
 const BookingBand = () => {
   const sectionRef = React.useRef();
-  const headingRef = React.useRef();
 
   React.useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !headingRef.current || !sectionRef.current) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !sectionRef.current) return undefined;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        headingRef.current,
+        sectionRef.current.querySelectorAll('[data-reveal]'),
         { opacity: 0, y: 32 },
         {
           opacity: 1,
           y: 0,
           duration: 0.8,
+          stagger: 0.13,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -882,16 +1030,16 @@ const BookingBand = () => {
   }, []);
 
   return (
-    <section style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', background: 'linear-gradient(135deg, #fffdf9 0%, #f6c9d4 100%)', textAlign: 'center' }}>
+    <section style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', background: 'linear-gradient(135deg, #fffdf9 0%, #f6c9d4 100%)', textAlign: 'center', ...SECTION_DIVIDER }}>
       <div ref={sectionRef} style={{ maxWidth: 620, margin: '0 auto' }}>
-        <div style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.18em', textTransform: 'uppercase', color: T.roseDp, marginBottom: 20 }}>Ready to book?</div>
-        <h2 ref={headingRef} style={{ fontFamily: serif, fontWeight: 500, lineHeight: 1.05, fontSize: 'clamp(36px,6vw,68px)', color: T.text, letterSpacing: '-0.01em', marginBottom: 16 }}>
+        <div data-reveal style={{ fontFamily: sans, fontSize: 10, fontWeight: 500, letterSpacing: '0.18em', textTransform: 'uppercase', color: T.roseDp, marginBottom: 20 }}>Ready to book?</div>
+        <h2 data-reveal style={{ fontFamily: serif, fontWeight: 500, lineHeight: 1.05, fontSize: 'clamp(36px,6vw,68px)', color: T.text, letterSpacing: '-0.01em', marginBottom: 16 }}>
           Book your next set.<br /><em style={{ fontStyle: 'italic', color: T.roseDp }}>Make it soft.</em>
         </h2>
-        <p style={{ fontFamily: sans, fontSize: 16, fontWeight: 300, color: T.text2, lineHeight: 1.7, marginBottom: 44 }}>
+        <p data-reveal style={{ fontFamily: sans, fontSize: 16, fontWeight: 300, color: T.text2, lineHeight: 1.7, marginBottom: 44 }}>
           Send a DM on Instagram or fill out the contact form to reserve your appointment - I&apos;ll get back to you soon!
         </p>
-        <div className="booking-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div data-reveal className="booking-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Btn href={BOOKING_URL} variant="dark" size="lg">DM to book</Btn>
           <Btn href={INSTAGRAM_URL} variant="outline" size="lg">{INSTAGRAM_HANDLE}</Btn>
         </div>
@@ -901,7 +1049,7 @@ const BookingBand = () => {
 };
 
 const Footer = () => (
-  <footer style={{ background: T.dark, padding: 'clamp(48px,6vw,80px) clamp(24px,5vw,80px) 28px' }}>
+  <footer style={{ background: T.dark, padding: 'clamp(48px,6vw,80px) clamp(24px,5vw,80px) 28px', ...SECTION_DIVIDER }}>
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
       <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 40, marginBottom: 52 }}>
         <div>
