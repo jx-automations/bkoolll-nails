@@ -77,6 +77,7 @@ button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation
   .mobile-menu-btn { display: flex !important; }
   .about-grid { grid-template-columns: 1fr !important; }
   .about-grid > div:last-child { order: -1; }
+  .owner-photo-card { padding: 10px !important; }
   .owner-photo-frame { height: 300px !important; }
   .about-support-photo { height: 120px !important; }
   .gallery-grid { grid-template-columns: 1fr 1fr !important; grid-auto-rows: 150px !important; }
@@ -112,8 +113,8 @@ const T = {
   rose: '#cf8399',
   roseDp: '#8f4c68',
   roseLt: '#f6dde3',
-  roseBtn: '#9c4f68',
-  roseBtnDp: '#7e3c52',
+  roseBtn: '#b8506d',
+  roseBtnDp: '#9c3f59',
   warmWhite: '#fffdf9',
   bgAlt: '#f5efe0',
   text: '#33403a',
@@ -150,12 +151,12 @@ const Btn = ({ children, variant = 'primary', size = 'md', onClick, style = {}, 
     primary: {
       background: hov ? T.roseBtnDp : T.roseBtn,
       color: '#fff',
-      boxShadow: hov ? '0 6px 28px rgba(126,60,82,0.5)' : '0 4px 20px rgba(156,79,104,0.38)',
+      boxShadow: hov ? '0 6px 28px rgba(156,63,89,0.5)' : '0 4px 20px rgba(184,80,109,0.38)',
     },
     rose: {
       background: hov ? T.roseBtnDp : T.roseBtn,
       color: '#fff',
-      boxShadow: hov ? '0 6px 28px rgba(126,60,82,0.4)' : '0 4px 20px rgba(156,79,104,0.3)',
+      boxShadow: hov ? '0 6px 28px rgba(156,63,89,0.4)' : '0 4px 20px rgba(184,80,109,0.3)',
     },
     ghost: {
       background: hov ? T.bgAlt : 'transparent',
@@ -866,34 +867,42 @@ const About = () => {
           </p>
           <Btn href={BOOKING_URL} variant="dark">DM to Book</Btn>
         </div>
-        <div ref={visualRef} className="about-visual" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoRows: 'auto', gap: 14 }}>
+        <div ref={visualRef} className="about-visual" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoRows: 'auto', gap: 20 }}>
           <div
             data-about-img
-            className="owner-photo-frame"
+            className="owner-photo-card"
             style={{
               gridColumn: '1 / -1',
-              borderRadius: 20,
-              overflow: 'hidden',
-              border: `8px solid ${T.white}`,
-              boxShadow: '0 28px 60px -16px rgba(51,64,58,0.32), 0 8px 24px rgba(51,64,58,0.14)',
-              height: 'clamp(320px,36vw,460px)',
+              background: T.white,
+              borderRadius: 26,
+              padding: 'clamp(14px,2.6vw,26px)',
+              boxShadow: '0 32px 70px -18px rgba(51,64,58,0.32), 0 10px 28px rgba(51,64,58,0.14)',
             }}
           >
-            <img
-              src="owner.jpg"
-              alt="Ivy, licensed nail technician in Phoenix, AZ"
-              loading="lazy"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s ease' }}
-              onMouseEnter={(e) => { e.target.style.transform = 'scale(1.04)'; }}
-              onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; }}
-            />
+            <div
+              className="owner-photo-frame"
+              style={{
+                borderRadius: 16,
+                overflow: 'hidden',
+                border: `10px solid ${T.white}`,
+                boxShadow: `0 0 0 4px ${T.roseLt}, inset 0 0 0 1px rgba(51,64,58,0.06)`,
+                height: 'clamp(340px,38vw,480px)',
+              }}
+            >
+              <img
+                src="owner.jpg"
+                alt="Ivy, licensed nail technician in Phoenix, AZ"
+                loading="lazy"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            </div>
           </div>
           {supportImages.map((src, i) => (
             <div
               key={i}
               data-about-img
               className="about-support-photo"
-              style={{ borderRadius: 14, overflow: 'hidden', height: 150, boxShadow: '0 6px 20px rgba(51,64,58,0.10)' }}
+              style={{ borderRadius: 14, overflow: 'hidden', height: 140, boxShadow: '0 6px 20px rgba(51,64,58,0.10)' }}
             >
               <img
                 src={src}
@@ -911,10 +920,12 @@ const About = () => {
   );
 };
 
+// SAMPLE / PLACEHOLDER content for demo purposes only.
+// Swap these for Ivy's real client reviews before any real launch.
 const testimonials = [
-  { text: 'Placeholder review: my Gel-X set came out so soft and pretty, exactly the vibe I wanted.', author: 'Client One', service: 'Gel-X Full Set' },
-  { text: 'Placeholder review: the hand-painted florals were so delicate and detailed, I get compliments constantly.', author: 'Client Two', service: 'Hand-Painted Florals' },
-  { text: 'Placeholder review: booked through DM and it was so easy, the French set was clean and elegant.', author: 'Client Three', service: 'Modern French Set' },
+  { text: 'My Gel-X set was so lightweight I forgot I was even wearing extensions - the length and shape were exactly what I asked for.', author: 'Sarah M.', service: 'Gel-X Full Set' },
+  { text: 'The polka dot French tips were exactly my vibe. Ivy nailed the color combo on the very first try.', author: 'Jasmine T.', service: 'Modern French Set' },
+  { text: 'My hand-painted florals lasted three weeks without a single chip, and I got compliments the whole time.', author: 'Courtney L.', service: 'Hand-Painted Florals' },
 ];
 
 const Testimonials = () => {
